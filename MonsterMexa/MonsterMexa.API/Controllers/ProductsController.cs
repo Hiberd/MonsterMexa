@@ -1,85 +1,107 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MonsterMexa.API.Contracts;
+using MonsterMexa.BusinessLogic;
+using MonsterMexa.Domain;
 
 namespace MonsterMexa.API.Controllers
 {
 
-    public class ProductsController : Controller
+    [ApiController]
+    [Route("[controller]")]
+    public class ProductsController : ControllerBase
     {
-         List<Product>? products;
-        public async Task Main()
+        private List<Product>? products;
+        private readonly ILogger<ProductsController> _logger;
+
+        public ProductsController(ILogger<ProductsController> logger)
         {
-            string form = @$" <form method='post'>
-            <label>Id: </label><br>
-            <input type='number' name='id'/><br>
-            <label>Name: </label><br>
-            <input name='Name'/><br>
-            <label>Size: </label><br>
-            <input type='number' name='Size'/><br>
-            <input type='submit' value='Send'/>
-            <input type='submit' value='Update' formaction='UpdateProduct'/>
-            </form><p></p>
-            <form method='get' action='AllList'>
-            <input  type='submit' value='List of products'/></form>
-            <form method='get' action='ListById'>
-            <input type='number' name='Id'>
-            <input  type='submit' value='Product id'/></form>
-";
-
-
-
-            Response.ContentType = "text/html;charset=utf-8";
-            
-            await Response.WriteAsync(form);
-          
+            _logger = logger;
         }
-        public async Task AllList()
+
+        [HttpGet]
+        public async Task<IActionResult> AllList()
         {
             products = Store.GetAllProducts();
 
-            string list = @"<table><caption><b>List</b></captiom>
-            <tr><td>Id</td><td>Name</td><td>Size</td></tr>";
+            string list = String.Empty;
 
             foreach (var product in products)
             {
-                list = $"{list}<tr><td>{product.Id}</td><td>{product.Name}</td><td>{product.Size}</td></tr>";
+                list = $"{list}{product.Id}-{product.Name}-{product.Size}\n";
             }
-            list = $"{list}</table>";
 
-            await Response.WriteAsync(list);
+            return Ok(list);
         }
 
-
-        public async Task ListById(int Id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ListById(int id)
         {
-            products = Store.GetAllProducts().Where(p => p.Id == Id).ToList();
+            products = Store.GetAllProducts();
 
-            string list = @"<table><caption><b>List</b></captiom>
-            <tr><td>Id</td><td>Name</td><td>Size</td></tr>";
+            if (!products.Any(p => p.Id == id))
+            {
+                return BadRequest("The entered ID does not exist");
+            }
+
+            products = products
+                .Where(p => p.Id == id)
+                .ToList();
+
+            string list = String.Empty;
 
             foreach (var product in products)
             {
-                list = $"{list}<tr><td>{product.Id}</td><td>{product.Name}</td><td>{product.Size}</td></tr>";
+                list = $"{list}{product.Id}-{product.Name}-{product.Size}\n";
             }
-            list = $"{list}</table>";
 
-            await Response.WriteAsync(list);
+            return Ok(list);
         }
-        public IActionResult UpdateProduct(int Id,string Name, int Size)
+
+        [HttpPut]
+        public IActionResult UpdateProduct(UpdateProductRequest request)
         {
-            Store.GetAllProducts().Where(p => p.Id == Id).Select(u => (u.Name = Name,u.Size=Size)).ToList();
-            return RedirectPermanent("~/Products/Main");
+            products = Store.GetAllProducts();
+
+            if (!products.Any(p => p.Id == request.Id))
+            {
+                return BadRequest("The entered ID does not exist");
+            }
+
+            products.RemoveAll(p => p.Id == request.Id);
+
+            var product = Product.Update(request.Id, request.Name, request.Size);
+
+            var productId = Store.UpdateProduct(product.Value);
+            return Ok(productId);
         }
+
         [HttpPost]
-        public IActionResult Main(int Id,string Name, int Size)
+        public IActionResult Create(CreateProductRequest request)
         {
-            if (Store.GetAllProducts().Exists(p =>p.Id==Id))
+            var product = Product.Create(request.Name, request.Size);
+            if (product.IsFailure)
             {
-                return Content("The product with this Id exists");
+                _logger.LogError(product.Error);
+                return BadRequest(product.Error);
             }
-            Store.CreateProduct(Id, Name, Size);
-            return RedirectPermanent("~/Products/Main");
+
+            var productId = Store.CreateProduct(product.Value);
+            return Ok(productId);
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            products = Store.GetAllProducts();
+
+            if (!products.Any(p => p.Id == id))
+            {
+                return BadRequest("The entered ID does not exist");
+            }
+
+            products.RemoveAll(p => p.Id == id);
+
+            return Ok();
         }
     }
-   
-   
 }
