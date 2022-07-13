@@ -5,6 +5,8 @@ namespace MonsterMexa.Domain
     public record Product
     {
         public const int MaxProductName = 20;
+        public const int MaxProductSize = 50;
+        public const int MinProductSize = 25;
         private Product(int id, string name, int size, int? categotyId)
         {
             Id = id;
@@ -20,7 +22,7 @@ namespace MonsterMexa.Domain
 
         public static Result<Product> Create(string name, int size)
         {
-            if (string.IsNullOrWhiteSpace(name)) // Зачем проверять, если атрибуты валидации срабатывают раньше
+            if (string.IsNullOrWhiteSpace(name))
             {
                 return Result.Failure<Product>("Name cannot be null or whitespace");
             }
@@ -32,11 +34,5 @@ namespace MonsterMexa.Domain
 
             return new Product(0, name, size, null);
         }
-
-        public static Result<Product> Update(int id, string name, int size)
-        {
-            return new Product(id, name, size, null);
-        }
-
     }
 }

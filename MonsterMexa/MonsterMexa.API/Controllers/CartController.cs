@@ -11,17 +11,14 @@ namespace MonsterMexa.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddProductToCart(int productId)
         {
-            var products = Store.GetAllProducts();
+            var product = Store.GetAllProducts().FirstOrDefault(p => p.Id == productId);
 
-            if (!products.Any(p => p.Id == productId))
+            if (product == null)
             {
                 return BadRequest("The entered ID does not exist");
             }
 
-            Product product = products.First(p => p.Id == productId);
-
-            Cart.GetAllProducts()
-                .Add(product);
+            Cart.AddProduct(product);
 
             return Ok(productId);
         }
@@ -54,14 +51,7 @@ namespace MonsterMexa.API.Controllers
         {
             var products = Cart.GetAllProducts();
 
-            string list = String.Empty;
-
-            foreach (var product in products)
-            {
-                list = $"{list}{product.Id}-{product.Name}-{product.Size}\n";
-            }
-
-            return Ok(list);
+            return Ok(products);
         }
     }
 }

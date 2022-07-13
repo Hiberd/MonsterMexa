@@ -35,21 +35,15 @@ namespace MonsterMexa.API.Controllers
         {
             var categories = CategoriesService.GetAllCategories();
 
-            string list = String.Empty;
-
-            foreach (var category in categories)
-            {
-                list = $"{list}{category.Id}-{category.Name}\n";
-            }
-
-            return Ok(list);
+            return Ok(categories);
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
             var categories = CategoriesService.GetAllCategories();
-            var products = Store.GetAllProducts();
+            var products = Store.GetAllProducts()
+                .Where(p => p.CategoryId == id).ToList();
 
             if (!categories.Any(p => p.Id == id))
             {
@@ -57,9 +51,16 @@ namespace MonsterMexa.API.Controllers
             }
 
             categories.RemoveAll(c => c.Id == id);
-            products.Where(p => p.CategoryId == id)
-                .Select(u => u with { CategoryId = null })
-                .ToList();
+
+            if (products.Count > 0)
+            {
+                foreach (var product in products)
+                {
+                    Product.Create(product.Name, product.Size);
+
+                    var productId = Store.ClearCategoryIdFromProduct(product);
+                }
+            }
 
             return Ok(id);
         }
@@ -67,34 +68,39 @@ namespace MonsterMexa.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(UpdateCategoryRequest request)
         {
-            var categories = CategoriesService.GetAllCategories();
+            var oldCategory = CategoriesService.GetAllCategories()
+                .FirstOrDefault(c => c.Id == request.Id);
 
-            if (!categories.Any(p => p.Id == request.Id))
+            if (oldCategory is null)
             {
                 return BadRequest("The entered ID does not exist");
             }
 
-            categories.Where(c => c.Id == request.Id)
-                .Select(u => u with { Name = request.Name })
-                .ToList();
+            var updateCategory = Category.Create(request.Name);
 
+            if (updateCategory.IsFailure)
+            {
+                _logger.LogError(updateCategory.Error);
+                return BadRequest(updateCategory.Error);
+            }
+
+            var categoryId = CategoriesService.UpdateCategory(updateCategory.Value);
             return Ok();
         }
 
         [HttpPost("{categoryId:int}/products")]
         public async Task<IActionResult> AddProduct(int productId, int categoryId)
         {
-            var categories = CategoriesService.GetAllCategories();
-            var products = Store.GetAllProducts();
+            var category = CategoriesService.GetAllCategories()
+                .FirstOrDefault(c => c.Id == categoryId);
 
-            if (!categories.Any(p => p.Id == categoryId) || !products.Any(p => p.Id == productId))
+            var product = Store.GetAllProducts()
+                .FirstOrDefault(p => p.Id == productId);
+
+            if (product is null || category is null)
             {
                 return BadRequest("The entered ID does not exist");
             }
-
-            Category category = categories.First(c => c.Id == categoryId);
-
-            Product product = products.First(p => p.Id == productId);
 
             category.Products.Add(product);
             product.CategoryId = categoryId;

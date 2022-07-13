@@ -16,7 +16,7 @@ namespace MonsterMexa.API.Contracts
         [StringLength(Product.MaxProductName)]
         public string Name { get; set; }
 
-        [Range(25, 50)]
+        [Range(Product.MinProductSize, Product.MaxProductSize)]
         public int Size { get; set; }
 
         public int Id { get; set; }

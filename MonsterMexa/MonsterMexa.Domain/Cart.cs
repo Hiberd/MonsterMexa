@@ -8,5 +8,10 @@
         {
             return Products;
         }
+
+        public static void AddProduct(Product product)
+        {
+            Products.Add(product);
+        }
     }
 }

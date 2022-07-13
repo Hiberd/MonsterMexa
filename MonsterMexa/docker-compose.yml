@@ -1,0 +1,24 @@
+version: '3.4'
+
+services:
+  monstermexa.api:
+    container_name: api
+    image: ${DOCKER_REGISTRY-}monstermexaapi
+    build:
+      context: .
+      dockerfile: MonsterMexa.API/Dockerfile
+
+  db:
+    container_name: db
+    image: postgres
+    restart: always
+    ports:
+      - 5433:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: pwd
+   
+volumes: 
+  db-data:
+    driver: local
