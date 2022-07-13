@@ -20,7 +20,15 @@ namespace MonsterMexa.BusinessLogic
 
         public static int UpdateProduct(Product product)
         {
-            products.Add(product);
+            products.RemoveAll(p => p.Id == product.Id);
+            products.Add(product with { Id = product.Id });
+            return product.Id;
+        }
+
+        public static int ClearCategoryIdFromProduct(Product product)
+        {
+            products.RemoveAll(p => p.Id == product.Id);
+            products.Add(product with { Id = product.Id, CategoryId = null });
             return product.Id;
         }
 

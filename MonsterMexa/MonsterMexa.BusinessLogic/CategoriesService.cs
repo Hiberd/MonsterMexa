@@ -20,7 +20,8 @@ namespace MonsterMexa.BusinessLogic
 
         public static int UpdateCategory(Category category)
         {
-            _categories.Add(category);
+            _categories.RemoveAll(c => c.Id == category.Id);
+            _categories.Add(category with { Id = category.Id});
             return category.Id;
         }
 

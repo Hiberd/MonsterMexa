@@ -23,14 +23,7 @@ namespace MonsterMexa.API.Controllers
         {
             products = Store.GetAllProducts();
 
-            string list = String.Empty;
-
-            foreach (var product in products)
-            {
-                list = $"{list}{product.Id}-{product.Name}-{product.Size}\n";
-            }
-
-            return Ok(list);
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
@@ -47,14 +40,7 @@ namespace MonsterMexa.API.Controllers
                 .Where(p => p.Id == id)
                 .ToList();
 
-            string list = String.Empty;
-
-            foreach (var product in products)
-            {
-                list = $"{list}{product.Id}-{product.Name}-{product.Size}\n";
-            }
-
-            return Ok(list);
+            return Ok(products);
         }
 
         [HttpPut]
@@ -67,9 +53,13 @@ namespace MonsterMexa.API.Controllers
                 return BadRequest("The entered ID does not exist");
             }
 
-            products.RemoveAll(p => p.Id == request.Id);
+            var product = Product.Create(request.Name, request.Size);
 
-            var product = Product.Update(request.Id, request.Name, request.Size);
+            if (product.IsFailure)
+            {
+                _logger.LogError(product.Error);
+                return BadRequest(product.Error);
+            }
 
             var productId = Store.UpdateProduct(product.Value);
             return Ok(productId);
