@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using MonsterMexa.API.Contracts;
 using MonsterMexa.BusinessLogic;
 using MonsterMexa.Domain;
@@ -10,30 +11,34 @@ namespace MonsterMexa.API.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ILogger<CategoriesController> _logger;
+        private readonly IMapper _mapper;
+        private readonly ICategotiesService _categotiesService;
 
-        public CategoriesController(ILogger<CategoriesController> logger)
+        public CategoriesController(ILogger<CategoriesController> logger, IMapper mapper, ICategotiesService categotiesService)
         {
             _logger = logger;
+            _mapper = mapper;
+            _categotiesService = categotiesService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateCategoryRequest request)
         {
-            var categories = Category.Create(request.Name);
-            if (categories.IsFailure)
+            var category = Category.Create(request.Name);
+            if (category.IsFailure)
             {
-                _logger.LogError(categories.Error);
-                return BadRequest(categories.Error);
+                _logger.LogError(category.Error);
+                return BadRequest(category.Error);
             }
 
-            var categoryId = CategoriesService.CreateCategory(categories.Value);
+            var categoryId = await _categotiesService.AddCategory(category.Value);
             return Ok(categoryId);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var categories = CategoriesService.GetAllCategories();
+            var categories = await _categotiesService.GetAllCategories();
 
             return Ok(categories);
         }
@@ -41,26 +46,7 @@ namespace MonsterMexa.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            var categories = CategoriesService.GetAllCategories();
-            var products = Store.GetAllProducts()
-                .Where(p => p.CategoryId == id).ToList();
-
-            if (!categories.Any(p => p.Id == id))
-            {
-                return BadRequest("The entered ID does not exist");
-            }
-
-            categories.RemoveAll(c => c.Id == id);
-
-            if (products.Count > 0)
-            {
-                foreach (var product in products)
-                {
-                    Product.Create(product.Name, product.Size);
-
-                    var productId = Store.ClearCategoryIdFromProduct(product);
-                }
-            }
+            await _categotiesService.Delete(id);
 
             return Ok(id);
         }
@@ -68,42 +54,22 @@ namespace MonsterMexa.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(UpdateCategoryRequest request)
         {
-            var oldCategory = CategoriesService.GetAllCategories()
-                .FirstOrDefault(c => c.Id == request.Id);
-
-            if (oldCategory is null)
+            var category = Category.Create(request.Name);
+            if (category.IsFailure)
             {
-                return BadRequest("The entered ID does not exist");
+                _logger.LogError(category.Error);
+                return BadRequest(category.Error);
             }
 
-            var updateCategory = Category.Create(request.Name);
+            await _categotiesService.Update(category.Value);
 
-            if (updateCategory.IsFailure)
-            {
-                _logger.LogError(updateCategory.Error);
-                return BadRequest(updateCategory.Error);
-            }
-
-            var categoryId = CategoriesService.UpdateCategory(updateCategory.Value);
             return Ok();
         }
 
         [HttpPost("{categoryId:int}/products")]
         public async Task<IActionResult> AddProduct(int productId, int categoryId)
         {
-            var category = CategoriesService.GetAllCategories()
-                .FirstOrDefault(c => c.Id == categoryId);
-
-            var product = Store.GetAllProducts()
-                .FirstOrDefault(p => p.Id == productId);
-
-            if (product is null || category is null)
-            {
-                return BadRequest("The entered ID does not exist");
-            }
-
-            category.Products.Add(product);
-            product.CategoryId = categoryId;
+            await _categotiesService.AddProduct(productId, categoryId);
 
             return Ok();
         }

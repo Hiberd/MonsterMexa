@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using MonsterMexa.API.Contracts;
 using MonsterMexa.BusinessLogic;
 using MonsterMexa.Domain;
@@ -10,18 +11,23 @@ namespace MonsterMexa.API.Controllers
     [Route("[controller]")]
     public class ProductsController : ControllerBase
     {
-        private List<Product>? products;
+        
         private readonly ILogger<ProductsController> _logger;
+        private readonly IProductsService _productService;
+        private readonly IMapper _mapper;
 
-        public ProductsController(ILogger<ProductsController> logger)
+        public ProductsController(ILogger<ProductsController> logger, IProductsService productService, IMapper mapper)
         {
             _logger = logger;
+            _productService = productService;
+            _mapper = mapper;
         }
+
 
         [HttpGet]
         public async Task<IActionResult> AllList()
         {
-            products = Store.GetAllProducts();
+            var products = await _productService.GetAllProducts();
 
             return Ok(products);
         }
@@ -29,40 +35,24 @@ namespace MonsterMexa.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ListById(int id)
         {
-            products = Store.GetAllProducts();
+            var product = await _productService.GetById(id);
 
-            if (!products.Any(p => p.Id == id))
+            if (product.Id != id)
             {
                 return BadRequest("The entered ID does not exist");
             }
 
-            products = products
-                .Where(p => p.Id == id)
-                .ToList();
-
-            return Ok(products);
+            return Ok(product);
         }
 
         [HttpPut]
         public IActionResult UpdateProduct(UpdateProductRequest request)
         {
-            products = Store.GetAllProducts();
+            var product = _mapper.Map<Contracts.UpdateProductRequest, Domain.Product>(request);
 
-            if (!products.Any(p => p.Id == request.Id))
-            {
-                return BadRequest("The entered ID does not exist");
-            }
+            _productService.Update(product);
 
-            var product = Product.Create(request.Name, request.Size);
-
-            if (product.IsFailure)
-            {
-                _logger.LogError(product.Error);
-                return BadRequest(product.Error);
-            }
-
-            var productId = Store.UpdateProduct(product.Value);
-            return Ok(productId);
+            return Ok();
         }
 
         [HttpPost]
@@ -75,23 +65,17 @@ namespace MonsterMexa.API.Controllers
                 return BadRequest(product.Error);
             }
 
-            var productId = Store.CreateProduct(product.Value);
-            return Ok(productId);
+            var productId = _productService.CreateProduct(product.Value);
+
+            return Ok();
         }
 
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            products = Store.GetAllProducts();
+            var product = _productService.Delete(id);
 
-            if (!products.Any(p => p.Id == id))
-            {
-                return BadRequest("The entered ID does not exist");
-            }
-
-            products.RemoveAll(p => p.Id == id);
-
-            return Ok();
+            return Ok(product);
         }
     }
 }

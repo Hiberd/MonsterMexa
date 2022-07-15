@@ -2,32 +2,43 @@
 
 namespace MonsterMexa.BusinessLogic
 {
-    public static class CategoriesService
+    public class CategoriesService : ICategotiesService
     {
-        private static List<Category> _categories = new List<Category>();
+        private readonly ICategoriesRepository _categoriesRepository;
 
-        public static int CreateCategory(Category category)
+        public CategoriesService(ICategoriesRepository categoriesRepository)
         {
-            int id = 1;
-            if (_categories.Count > 0)
-            {
-                id = _categories.Max(p => p.Id) + 1;
-            }
-
-            _categories.Add(category with { Id = id });
-            return id;
+            _categoriesRepository = categoriesRepository;
         }
 
-        public static int UpdateCategory(Category category)
+        public async Task<int> AddCategory(Category category)
         {
-            _categories.RemoveAll(c => c.Id == category.Id);
-            _categories.Add(category with { Id = category.Id});
-            return category.Id;
+            return await _categoriesRepository.AddCategory(category);
         }
 
-        public static List<Category> GetAllCategories()
+        public async Task AddProduct(int productId, int categoryId)
         {
-            return _categories;
+            await _categoriesRepository.AddProduct(productId, categoryId);
+        }
+
+        public async Task Delete(int categoryId)
+        {
+            await _categoriesRepository.Delete(categoryId);
+        }
+
+        public async Task<Category[]> GetAllCategories()
+        {
+            return await _categoriesRepository.GetAll();
+        }
+
+        public Task<Category> GetById(int categoryId)
+        {
+            return _categoriesRepository.GetById(categoryId);
+        }
+
+        public async Task Update(Category category)
+        {
+            await _categoriesRepository.Update(category);
         }
     }
 }

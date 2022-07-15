@@ -1,17 +1,15 @@
 ﻿namespace MonsterMexa.Domain
 {
-    public static class Cart
+    public class Cart
     {
-        private static List<Product> Products { get; set; } = new List<Product>();
+        public int Id { get; set; }
 
-        public static List<Product> GetAllProducts()
-        {
-            return Products;
-        }
+        public string UserId { get; set; }
 
-        public static void AddProduct(Product product)
-        {
-            Products.Add(product);
-        }
+        public int Quantity { get; set; } = 0;
+
+        public int ProductId { get; set; }
+
+        public Product? Product { get; set; }
     }
 }

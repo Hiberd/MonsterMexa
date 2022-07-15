@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MonsterMexa.BusinessLogic;
 using MonsterMexa.Domain;
 
 namespace MonsterMexa.API.Controllers
@@ -8,40 +7,41 @@ namespace MonsterMexa.API.Controllers
     [Route("[controller]")]
     public class CartController : ControllerBase
     {
+        private readonly ICartService _cartService;
+        private readonly HttpContext _context;
+
+        public CartController(ICartService cartService, HttpContext context)
+        {
+            _cartService = cartService;
+            _context = context;
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddProductToCart(int productId)
         {
-            var product = Store.GetAllProducts().FirstOrDefault(p => p.Id == productId);
+            string userId = GetUserId();
 
-            if (product == null)
-            {
-                return BadRequest("The entered ID does not exist");
-            }
+            await _cartService.AddProduct(productId, userId);
 
-            Cart.AddProduct(product);
-
-            return Ok(productId);
+            return Ok();
         }
 
         [HttpDelete("{productId}")]
         public async Task<IActionResult> DeleteProductFromCart(int productId)
         {
-            var products = Cart.GetAllProducts();
+            string userId = GetUserId();
 
-            if (!products.Any(p => p.Id == productId))
-            {
-                return BadRequest("The entered ID does not exist");
-            }
+            await _cartService.DeleteProduct(productId, userId);
 
-            products.RemoveAll(p => p.Id == productId);
-
-            return Ok(productId);
+            return Ok();
         }
 
         [HttpDelete]
         public async Task<IActionResult> ClearCart()
         {
-            Cart.GetAllProducts().Clear();
+            string userId = GetUserId();
+
+            await _cartService.ClearCart(userId);
 
             return Ok();
         }
@@ -49,9 +49,23 @@ namespace MonsterMexa.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllProductsFromCart()
         {
-            var products = Cart.GetAllProducts();
+            string userId = GetUserId();
 
-            return Ok(products);
+            var products = await _cartService.GetAllProductsFromCart(userId);
+
+            return Ok();
+        }
+
+        [NonAction]
+        public string GetUserId()
+        {
+            if (!_context.Session.Keys.Contains("UserId"))
+            {
+                string tempUserId = Guid.NewGuid().ToString();
+                _context.Session.SetString("UserId", tempUserId);
+            }
+
+            return _context.Session.GetString("UserId");
         }
     }
 }
