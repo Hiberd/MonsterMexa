@@ -8,6 +8,8 @@ namespace MonsterMexa.DataAccess.Postgres
         {
             CreateMap<Entities.Product, Domain.Product>().ReverseMap();
             CreateMap<Entities.Category, Domain.Category>().ReverseMap();
+            CreateMap<Entities.Cart, Domain.Cart>().ReverseMap();
         }
     }
 }
+

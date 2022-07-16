@@ -8,9 +8,9 @@ namespace MonsterMexa.API.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
-        private readonly HttpContext _context;
+        private readonly ControllerContext _context;
 
-        public CartController(ICartService cartService, HttpContext context)
+        public CartController(ICartService cartService, ControllerContext context)
         {
             _cartService = cartService;
             _context = context;
@@ -53,19 +53,23 @@ namespace MonsterMexa.API.Controllers
 
             var products = await _cartService.GetAllProductsFromCart(userId);
 
-            return Ok();
+            return Ok(products);
         }
 
         [NonAction]
         public string GetUserId()
         {
-            if (!_context.Session.Keys.Contains("UserId"))
+            if (Request.Cookies.ContainsKey("UserId"))
+            {
+                return Request.Cookies["UserId"];
+            }
+            else
             {
                 string tempUserId = Guid.NewGuid().ToString();
-                _context.Session.SetString("UserId", tempUserId);
-            }
+                Response.Cookies.Append("UserId", tempUserId);
 
-            return _context.Session.GetString("UserId");
+                return tempUserId;
+            }
         }
     }
 }

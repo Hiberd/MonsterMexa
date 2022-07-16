@@ -67,9 +67,14 @@ namespace MonsterMexa.DataAccess.Postgres
 
         public async Task Update(Category category)
         {
-            var newCategory = _mapper.Map<Domain.Category, Entities.Category>(category);
+            var oldCategory = await _dbContext.Categories
+                 .FirstOrDefaultAsync(c => c.Id == category.Id);
 
-            _dbContext.Categories.Update(newCategory);
+            if (oldCategory != null)
+            {
+                oldCategory.Name = category.Name;
+            }
+
             await _dbContext.SaveChangesAsync();
         }
     }

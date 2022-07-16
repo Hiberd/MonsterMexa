@@ -5,9 +5,9 @@ namespace MonsterMexa.Domain
     public record Category
     {
         public const int MaxCategoryName = 15;
-        private Category(int categoryId, string name, List<Product> products)
+        private Category(int id, string name, List<Product> products)
         {
-            Id = categoryId;
+            Id = id;
             Name = name;
             Products = products;
         }
