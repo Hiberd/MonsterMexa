@@ -7,12 +7,12 @@ namespace MonsterMexa.Domain
         public const int MaxProductName = 20;
         public const int MaxProductSize = 50;
         public const int MinProductSize = 25;
-        private Product(int id, string name, int size, int? categotyId)
+        private Product(int id, string name, int size, int? categoryId)
         {
             Id = id;
             Name = name;
             Size = size;
-            CategoryId = categotyId;
+            CategoryId = categoryId;
         }
 
         public int Id { get; init; }

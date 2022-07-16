@@ -57,7 +57,11 @@ namespace MonsterMexa.DataAccess.Postgres
             var cart = await _dbContext.Cart
                 .FirstOrDefaultAsync(c => c.ProductId == productId
                 && c.UserId == userId);
-            _dbContext.SaveChanges();
+            if (cart != null)
+            {
+                _dbContext.Cart.Remove(cart);
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task<Cart[]> GetAllProductsFromCart(string userId)

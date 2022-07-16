@@ -3,15 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using MonsterMexa.API.Contracts;
 using MonsterMexa.BusinessLogic;
 using MonsterMexa.Domain;
+using MonsterMexa.API;
 
 namespace MonsterMexa.API.Controllers
 {
-
     [ApiController]
     [Route("[controller]")]
     public class ProductsController : ControllerBase
     {
-        
         private readonly ILogger<ProductsController> _logger;
         private readonly IProductsService _productService;
         private readonly IMapper _mapper;
@@ -22,7 +21,6 @@ namespace MonsterMexa.API.Controllers
             _productService = productService;
             _mapper = mapper;
         }
-
 
         [HttpGet]
         public async Task<IActionResult> AllList()
@@ -42,21 +40,29 @@ namespace MonsterMexa.API.Controllers
                 return BadRequest("The entered ID does not exist");
             }
 
-            return Ok(product);
+            var productResponse = _mapper.Map<Domain.Product, Contracts.GetProductResponse>(product);
+
+            return Ok(productResponse);
         }
 
         [HttpPut]
-        public IActionResult UpdateProduct(UpdateProductRequest request)
+        public async Task<IActionResult> UpdateProduct(UpdateProductRequest request)
         {
-            var product = _mapper.Map<Contracts.UpdateProductRequest, Domain.Product>(request);
+            var product = Product.Create(request.Name, request.Size);
 
-            _productService.Update(product);
+            if (product.IsFailure)
+            {
+                _logger.LogError(product.Error);
+                return BadRequest(product.Error);
+            }
+
+            await _productService.Update(product.Value with { Id = request.Id });
 
             return Ok();
         }
 
         [HttpPost]
-        public IActionResult Create(CreateProductRequest request)
+        public async Task<IActionResult> Create(CreateProductRequest request)
         {
             var product = Product.Create(request.Name, request.Size);
             if (product.IsFailure)
@@ -65,15 +71,15 @@ namespace MonsterMexa.API.Controllers
                 return BadRequest(product.Error);
             }
 
-            var productId = _productService.CreateProduct(product.Value);
+            var productId = await _productService.CreateProduct(product.Value);
 
-            return Ok();
+            return Ok(productId);
         }
 
         [HttpDelete]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var product = _productService.Delete(id);
+            var product = await _productService.Delete(id);
 
             return Ok(product);
         }

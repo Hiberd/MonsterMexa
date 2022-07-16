@@ -18,7 +18,6 @@ namespace MonsterMexa.DataAccess.Postgres
         public async Task<int> Add(Product product)
         {
             var productEntity = _mapper.Map<Domain.Product, Entities.Product>(product);
-
             await _dbContext.Products.AddAsync(productEntity);
             await _dbContext.SaveChangesAsync();
 
@@ -36,6 +35,7 @@ namespace MonsterMexa.DataAccess.Postgres
             }
 
             _dbContext.Products.Remove(product);
+            await _dbContext.SaveChangesAsync();
 
             return true;
         }
@@ -72,7 +72,15 @@ namespace MonsterMexa.DataAccess.Postgres
         {
             var newProduct = _mapper.Map<Domain.Product, Entities.Product>(product);
 
-            _dbContext.Products.Update(newProduct);
+            var oldProduct = await _dbContext.Products
+                .FirstOrDefaultAsync(p => p.Id == newProduct.Id);
+
+            if (oldProduct != null)
+            {
+                oldProduct.Size = newProduct.Size;
+                oldProduct.Name = newProduct.Name;
+            }
+
             await _dbContext.SaveChangesAsync();
         }
     }

@@ -12,13 +12,13 @@ namespace MonsterMexa.API.Contracts
             Size = size;
         }
 
+        public int Id { get; set; }
+
         [Required]
         [StringLength(Product.MaxProductName)]
         public string Name { get; set; }
 
         [Range(Product.MinProductSize, Product.MaxProductSize)]
         public int Size { get; set; }
-
-        public int Id { get; set; }
     }
 }

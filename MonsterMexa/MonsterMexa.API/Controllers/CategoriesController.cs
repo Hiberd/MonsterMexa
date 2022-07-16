@@ -61,7 +61,7 @@ namespace MonsterMexa.API.Controllers
                 return BadRequest(category.Error);
             }
 
-            await _categotiesService.Update(category.Value);
+            await _categotiesService.Update(category.Value with { Id = request.Id });
 
             return Ok();
         }
