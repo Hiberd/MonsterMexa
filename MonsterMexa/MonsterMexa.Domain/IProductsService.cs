@@ -1,4 +1,6 @@
 ﻿
+using CSharpFunctionalExtensions;
+
 namespace MonsterMexa.Domain
 {
     public interface IProductsService
@@ -9,7 +11,7 @@ namespace MonsterMexa.Domain
 
         public Task<Product[]> GetAllProducts();
 
-        public Task<Product> GetById(int productId);
+        public Task<Result<Product>> GetById(int productId);
 
         public Task<Product[]> GetByCategory(int categoryId);
 

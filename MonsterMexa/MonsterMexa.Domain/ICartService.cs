@@ -1,8 +1,10 @@
-﻿namespace MonsterMexa.Domain
+﻿using CSharpFunctionalExtensions;
+
+namespace MonsterMexa.Domain
 {
     public interface ICartService
     {
-        public Task AddProduct(int productId, string userId);
+        public Task<Result<int>> AddProduct(int productId, string userId);
 
         public Task DeleteProduct(int productId, string userId);
 

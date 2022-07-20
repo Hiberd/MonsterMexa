@@ -6,7 +6,7 @@ namespace MonsterMexa.API
     {
         public ApiMappingProfile()
         {
-            CreateMap<Contracts.GetProductResponse, Domain.Product>().ReverseMap();
+            CreateMap<Domain.Product, Contracts.GetProductResponse>();
         }
     }
 }

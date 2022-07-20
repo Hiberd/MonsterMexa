@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 using MonsterMexa.Domain;
 

@@ -32,7 +32,7 @@ namespace MonsterMexa.DataAccess.Postgres
             if (product != null && category != null)
             {
                 category.Products.Add(product);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
 
@@ -43,7 +43,7 @@ namespace MonsterMexa.DataAccess.Postgres
             if (category != null)
             {
                 _dbContext.Categories.Remove(category);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
         }
 

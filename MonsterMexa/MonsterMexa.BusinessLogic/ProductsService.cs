@@ -1,4 +1,5 @@
-﻿using MonsterMexa.Domain;
+﻿using CSharpFunctionalExtensions;
+using MonsterMexa.Domain;
 
 namespace MonsterMexa.BusinessLogic
 {
@@ -31,7 +32,7 @@ namespace MonsterMexa.BusinessLogic
             return await _pepository.GetByCategory(categoryId);
         }
 
-        public async Task<Product> GetById(int productId)
+        public async Task<Result<Product>> GetById(int productId)
         {
             return await _pepository.GetById(productId);
         }

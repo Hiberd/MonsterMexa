@@ -8,12 +8,12 @@ namespace MonsterMexa.API.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
-        private readonly ControllerContext _context;
+        private readonly ILogger<CartController> _logger;
 
-        public CartController(ICartService cartService, ControllerContext context)
+        public CartController(ICartService cartService, ILogger<CartController> logger)
         {
             _cartService = cartService;
-            _context = context;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -21,9 +21,15 @@ namespace MonsterMexa.API.Controllers
         {
             string userId = GetUserId();
 
-            await _cartService.AddProduct(productId, userId);
+            var id = await _cartService.AddProduct(productId, userId);
 
-            return Ok();
+            if (id.IsFailure)
+            {
+                _logger.LogError(id.Error);
+                return BadRequest(id.Error);
+            }
+
+            return Ok(id.Value);
         }
 
         [HttpDelete("{productId}")]
