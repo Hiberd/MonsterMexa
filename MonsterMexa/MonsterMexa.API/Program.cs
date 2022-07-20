@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MonsterMexa.API;
+using MonsterMexa.API.Controllers;
 using MonsterMexa.BusinessLogic;
 using MonsterMexa.DataAccess.Postgres;
 using MonsterMexa.Domain;
@@ -18,18 +19,24 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<DataAccessMappingProfile>();
 });
 
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession();
+
 
 builder.Services.AddScoped<IProductsPepository, ProductsRepository>();
 builder.Services.AddScoped<IProductsService, ProductsService>();
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<ICategotiesService, CategoriesService>();
-builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
-builder.Services.AddScoped<ControllerContext>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 
-builder.Services.AddControllers();
+builder.Services.AddScoped<ServiceB>();
+builder.Services.AddScoped<ServiceA>();
+builder.Services.AddTransient<RepositoryA>();
+builder.Services.AddScoped<RepositoryB>();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+
+builder.Services.AddControllers().AddControllersAsServices();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

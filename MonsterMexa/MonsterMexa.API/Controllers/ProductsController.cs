@@ -23,24 +23,31 @@ namespace MonsterMexa.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AllList()
+        public async Task<IActionResult> GetAll()
         {
             var products = await _productService.GetAllProducts();
 
             return Ok(products);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ListById(int id)
+        [HttpGet("{productId:int}")]
+        public async Task<IActionResult> Get(int productId)
         {
-            var product = await _productService.GetById(id);
+            var product = await _productService.GetById(productId);
 
-            if (product.Id != id)
+            if (product.Value == null)
             {
+                _logger.LogError("The entered ID does not exist");
                 return BadRequest("The entered ID does not exist");
             }
 
-            var productResponse = _mapper.Map<Domain.Product, Contracts.GetProductResponse>(product);
+            if (product.IsFailure)
+            {
+                _logger.LogError(product.Error);
+                return BadRequest(product.Error);
+            }
+
+            var productResponse = _mapper.Map<Domain.Product, Contracts.GetProductResponse>(product.Value);
 
             return Ok(productResponse);
         }

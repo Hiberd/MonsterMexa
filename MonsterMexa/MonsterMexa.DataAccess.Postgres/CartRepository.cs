@@ -15,7 +15,7 @@ namespace MonsterMexa.DataAccess.Postgres
             _mapper = mapper;
         }
 
-        public async Task AddProduct(int productId, string userId)
+        public async Task<int> AddProduct(int productId, string userId)
         {
             var cartItem = await _dbContext.Cart
                 .FirstOrDefaultAsync(c => c.ProductId == productId
@@ -41,6 +41,8 @@ namespace MonsterMexa.DataAccess.Postgres
             }
 
             await _dbContext.SaveChangesAsync();
+
+            return product.Id;
         }
 
         public async Task ClearCart(string userId)
@@ -49,7 +51,7 @@ namespace MonsterMexa.DataAccess.Postgres
                  .Where(c => c.UserId == userId)
                  .ToListAsync();
             _dbContext.Cart.RemoveRange(cart);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteProduct(int productId, string userId)

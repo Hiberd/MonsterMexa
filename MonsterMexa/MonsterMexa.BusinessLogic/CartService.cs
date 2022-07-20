@@ -1,19 +1,31 @@
-﻿using MonsterMexa.Domain;
+﻿using CSharpFunctionalExtensions;
+using MonsterMexa.Domain;
 
 namespace MonsterMexa.BusinessLogic
 {
     public class CartService : ICartService
     {
         private readonly ICartRepository _cartRepository;
+        private readonly IProductsPepository _productsPepository;
 
-        public CartService(ICartRepository cartRepository)
+        public CartService(ICartRepository cartRepository, IProductsPepository productsPepository)
         {
             _cartRepository = cartRepository;
+            _productsPepository = productsPepository;
         }
 
-        public async Task AddProduct(int productId, string userId)
+        public async Task<Result<int>> AddProduct(int productId, string userId)
         {
-            await _cartRepository.AddProduct(productId, userId);
+            var product = await _productsPepository.GetById(productId);
+
+            if (product == null)
+            {
+                return Result.Failure<int>("The entered ID does not exist");
+            }
+
+            var id = await _cartRepository.AddProduct(productId, userId);
+
+            return id;
         }
 
         public async Task ClearCart(string userId)
