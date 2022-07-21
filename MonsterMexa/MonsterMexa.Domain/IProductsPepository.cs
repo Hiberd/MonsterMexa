@@ -1,6 +1,4 @@
 ﻿
-using CSharpFunctionalExtensions;
-
 namespace MonsterMexa.Domain
 {
     public interface IProductsPepository

@@ -35,12 +35,6 @@ namespace MonsterMexa.API.Controllers
         {
             var product = await _productService.GetById(productId);
 
-            if (product.Value == null)
-            {
-                _logger.LogError("The entered ID does not exist");
-                return BadRequest("The entered ID does not exist");
-            }
-
             if (product.IsFailure)
             {
                 _logger.LogError(product.Error);
