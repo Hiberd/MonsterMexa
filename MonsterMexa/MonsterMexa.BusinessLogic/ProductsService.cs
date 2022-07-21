@@ -34,12 +34,19 @@ namespace MonsterMexa.BusinessLogic
 
         public async Task<Result<Product>> GetById(int productId)
         {
-            return await _pepository.GetById(productId);
+            var product = await _pepository.GetById(productId);
+
+            if (product == null)
+            {
+                return Result.Failure<Product>("The entered ID does not exist");
+            }
+
+            return product;
         }
 
         public async Task Update(Product product)
         {
-           await _pepository.Update(product);
+            await _pepository.Update(product);
         }
     }
 }

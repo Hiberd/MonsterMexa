@@ -19,14 +19,14 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<DataAccessMappingProfile>();
 });
 
-
-
 builder.Services.AddScoped<IProductsPepository, ProductsRepository>();
 builder.Services.AddScoped<IProductsService, ProductsService>();
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<ICategotiesService, CategoriesService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 
 builder.Services.AddScoped<ServiceB>();
 builder.Services.AddScoped<ServiceA>();

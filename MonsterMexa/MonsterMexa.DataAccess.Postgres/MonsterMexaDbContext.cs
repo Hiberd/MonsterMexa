@@ -15,5 +15,7 @@ namespace MonsterMexa.DataAccess.Postgres
         public DbSet<Category> Categories { get; set; } = null!;
 
         public DbSet<Cart> Cart { get; set; } = null!;
+
+        public DbSet<Warehouse> Warehouse { get; set; } = null!;
     }
 }
