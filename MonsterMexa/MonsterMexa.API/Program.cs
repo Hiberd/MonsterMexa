@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<MonsterMexaDbContext>(options =>
 {
-    options.UseNpgsql("Host=localhost;Port=5433;Database=MonsterMexadb;Username=postgres;Password=pwd;Integrated Security=True");
+    options.UseNpgsql("Host=localhost;Port=5433;Database=MonsterMexdb;Username=postgres;Password=pwd;Integrated Security=True");
 });
 
 builder.Services.AddAutoMapper(cfg =>
@@ -40,6 +40,8 @@ builder.Services.AddControllers().AddControllersAsServices();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var app = builder.Build();
 app.UseSession();

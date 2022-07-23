@@ -75,5 +75,14 @@ namespace MonsterMexa.DataAccess.Postgres
 
             return _mapper.Map<Entities.Cart[], Domain.Cart[]>(products);
         }
+
+        public async Task<Cart> Get(int productId)
+        {
+            var product = await _dbContext.Cart
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.ProductId == productId);
+
+            return _mapper.Map<Entities.Cart, Domain.Cart>(product);
+        }
     }
 }

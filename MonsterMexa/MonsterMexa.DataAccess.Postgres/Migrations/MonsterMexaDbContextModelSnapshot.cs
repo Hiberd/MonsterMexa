@@ -44,7 +44,7 @@ namespace MonsterMexa.DataAccess.Postgres.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Cart");
+                    b.ToTable("Cart", (string)null);
                 });
 
             modelBuilder.Entity("MonsterMexa.DataAccess.Postgres.Entities.Category", b =>
@@ -61,7 +61,7 @@ namespace MonsterMexa.DataAccess.Postgres.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("MonsterMexa.DataAccess.Postgres.Entities.Product", b =>
@@ -86,7 +86,7 @@ namespace MonsterMexa.DataAccess.Postgres.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("MonsterMexa.DataAccess.Postgres.Entities.Warehouse", b =>
@@ -110,7 +110,7 @@ namespace MonsterMexa.DataAccess.Postgres.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Warehouse");
+                    b.ToTable("Warehouse", (string)null);
                 });
 
             modelBuilder.Entity("MonsterMexa.DataAccess.Postgres.Entities.Cart", b =>

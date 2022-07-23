@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MonsterMexa.DataAccess.Postgres.Migrations
 {
     [DbContext(typeof(MonsterMexaDbContext))]
-    [Migration("20220721141824_add_warehouse")]
+    [Migration("20220722164456_add_warehouse")]
     partial class add_warehouse
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
