@@ -32,6 +32,11 @@ namespace MonsterMexa.Domain
                 return Result.Failure<Product>($"Name cannot have more than {MaxProductName} char");
             }
 
+            if (size < MinProductSize && size > MaxProductSize)
+            {
+                return Result.Failure<Product>($"Size cannot be more than {MaxProductSize} amd less than {MinProductSize}");
+            }
+
             return new Product(0, name, size, null);
         }
     }
