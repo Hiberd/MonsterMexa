@@ -19,15 +19,20 @@ namespace MonsterMexa.DataAccess.Postgres
         {
             var productEntity = _mapper.Map<Domain.Product, Entities.Product>(product);
 
-            await _dbContext.Products.AddAsync(productEntity);
+            if (!await _dbContext.Products.ContainsAsync(productEntity))
+            {
+                await _dbContext.Products.AddAsync(productEntity);
 
-            await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
+            }
 
             var warehouse = new Entities.Warehouse()
             {
                 Quantity = quantity,
-                ProductId = productEntity.Id
+                ProductId = productEntity.Id,
             };
+
+            await _dbContext.Warehouse.AddAsync(warehouse);
 
             await _dbContext.SaveChangesAsync();
 
@@ -40,6 +45,8 @@ namespace MonsterMexa.DataAccess.Postgres
 
             item.Quantity = quantity;
 
+            await _dbContext.SaveChangesAsync();
+
             return quantity;
         }
 
@@ -49,6 +56,7 @@ namespace MonsterMexa.DataAccess.Postgres
                 .Where(p => p.DeletedAt == null)
                 .Select(p => new Models.ProductsFromWarehouse
                 {
+                    ProductId = p.ProductId,
                     Quantity = p.Quantity,
                     Name = p.Product.Name,
                     Size = p.Product.Size
@@ -63,10 +71,11 @@ namespace MonsterMexa.DataAccess.Postgres
                 .Where(p => p.DeletedAt == null && p.ProductId == productId)
                 .Select(p => new Models.ProductsFromWarehouse
                 {
+                    ProductId = p.ProductId,
                     Quantity = p.Quantity,
                     Name = p.Product.Name,
                     Size = p.Product.Size
-                }).SingleAsync();
+                }).SingleOrDefaultAsync();
 
             return product;
         }

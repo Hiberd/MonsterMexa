@@ -10,5 +10,7 @@ namespace MonsterMexa.Domain
         public Task ClearCart(string userId);
 
         public Task<Cart[]> GetAllProductsFromCart(string userId);
+
+        public Task<Cart> Get(int productId);
     }
 }
