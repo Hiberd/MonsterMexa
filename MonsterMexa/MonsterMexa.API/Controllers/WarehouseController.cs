@@ -4,6 +4,7 @@ using MonsterMexa.API.Contracts;
 using MonsterMexa.BusinessLogic;
 using MonsterMexa.Domain;
 using MonsterMexa.API;
+using System.ComponentModel.DataAnnotations;
 
 namespace MonsterMexa.API.Controllers
 {
@@ -21,19 +22,17 @@ namespace MonsterMexa.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProduct(CreateProductRequest request, int quantity)
+        public async Task<IActionResult> AddProduct([Required] int productId, [Required] int quantity)
         {
-            var product = Product.Create(request.Name, request.Size);
+            var id = await _warehouseService.AddProduct(productId, quantity);
 
-            if (product.IsFailure)
+            if (id.IsFailure)
             {
-                _logger.LogError(product.Error);
-                return BadRequest(product.Error);
+                _logger.LogError(id.Error);
+                return BadRequest(id.Error);
             }
 
-            var id = await _warehouseService.AddProduct(product.Value, quantity);
-
-            return Ok(id);
+            return Ok(id.Value);
         }
 
         [HttpGet]

@@ -1,7 +1,7 @@
 ﻿
 namespace MonsterMexa.DataAccess.Postgres.Entities
 {
-    public class Warehouse
+    public class WarehouseProduct
     {
         public int Id { get; set; }
 
