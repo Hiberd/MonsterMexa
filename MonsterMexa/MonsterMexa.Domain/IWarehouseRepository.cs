@@ -8,9 +8,9 @@ namespace MonsterMexa.Domain
 
         public Task<int> ChangeQuantity(int productId, int quantity);
 
-        public Task<Models.ProductsFromWarehouse[]> GetAll();
+        public Task<Models.WarehouseProduct[]> GetAll();
 
-        public Task<Models.ProductsFromWarehouse> GetById(int productId);
+        public Task<Models.WarehouseProduct> GetById(int productId);
 
         public Task<bool> SoftDelete(int productId);
 

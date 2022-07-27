@@ -17,44 +17,35 @@ namespace MonsterMexa.DataAccess.Postgres
 
         public async Task<int> AddProduct(Product product, int quantity)
         {
-            var productEntity = _mapper.Map<Domain.Product, Entities.Product>(product);
-
-            if (!await _dbContext.Products.ContainsAsync(productEntity))
-            {
-                await _dbContext.Products.AddAsync(productEntity);
-
-                await _dbContext.SaveChangesAsync();
-            }
-
-            var warehouse = new Entities.Warehouse()
+            var warehouse = new Entities.WarehouseProduct()
             {
                 Quantity = quantity,
-                ProductId = productEntity.Id,
+                ProductId = product.Id,
             };
 
             await _dbContext.Warehouse.AddAsync(warehouse);
 
             await _dbContext.SaveChangesAsync();
 
-            return productEntity.Id;
+            return product.Id;
         }
 
         public async Task<int> ChangeQuantity(int productId, int quantity)
         {
-            var item = await _dbContext.Warehouse.FirstOrDefaultAsync(i => i.ProductId == productId);
+            var product = await _dbContext.Warehouse.FirstOrDefaultAsync(i => i.ProductId == productId);
 
-            item.Quantity = quantity;
+            product.Quantity = quantity;
 
             await _dbContext.SaveChangesAsync();
 
             return quantity;
         }
 
-        public async Task<Models.ProductsFromWarehouse[]> GetAll()
+        public async Task<Models.WarehouseProduct[]> GetAll()
         {
             var products = await _dbContext.Warehouse
                 .Where(p => p.DeletedAt == null)
-                .Select(p => new Models.ProductsFromWarehouse
+                .Select(p => new Models.WarehouseProduct
                 {
                     ProductId = p.ProductId,
                     Quantity = p.Quantity,
@@ -65,17 +56,17 @@ namespace MonsterMexa.DataAccess.Postgres
             return products;
         }
 
-        public async Task<Models.ProductsFromWarehouse> GetById(int productId)
+        public async Task<Models.WarehouseProduct> GetById(int productId)
         {
             var product = await _dbContext.Warehouse
                 .Where(p => p.DeletedAt == null && p.ProductId == productId)
-                .Select(p => new Models.ProductsFromWarehouse
+                .Select(p => new Models.WarehouseProduct
                 {
                     ProductId = p.ProductId,
                     Quantity = p.Quantity,
                     Name = p.Product.Name,
                     Size = p.Product.Size
-                }).SingleOrDefaultAsync();
+                }).FirstOrDefaultAsync();
 
             return product;
         }

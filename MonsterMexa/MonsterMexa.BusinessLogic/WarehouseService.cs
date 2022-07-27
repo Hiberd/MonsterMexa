@@ -15,23 +15,37 @@ namespace MonsterMexa.BusinessLogic
             _productsPepository = productsPepository;
         }
 
-        public async Task<int> AddProduct(Product product, int quantity)
+        public async Task<Result<int>> AddProduct(int productId, int quantity)
         {
+            var product = await _productsPepository.GetById(productId);
+
+            if (product == null)
+            {
+                return Result.Failure<int>("The entered ID does not exist");
+            }
+
+            var warehouseProduct = await _warehouseRepository.GetById(productId);
+
+            if (warehouseProduct != null)
+            {
+                return Result.Failure<int>("The entered ID is existing");
+            }
+
             return await _warehouseRepository.AddProduct(product, quantity);
         }
 
-        public async Task<ProductsFromWarehouse[]> GetAll()
+        public async Task<WarehouseProduct[]> GetAll()
         {
             return await _warehouseRepository.GetAll();
         }
 
-        public async Task<Result<ProductsFromWarehouse>> GetById(int productId)
+        public async Task<Result<WarehouseProduct>> GetById(int productId)
         {
             var product = await _warehouseRepository.GetById(productId);
 
             if (product == null)
             {
-                return Result.Failure<ProductsFromWarehouse>("The entered ID does not exist");
+                return Result.Failure<WarehouseProduct>("The entered ID does not exist");
             }
 
             return product;
@@ -50,7 +64,7 @@ namespace MonsterMexa.BusinessLogic
 
             if (warehouseProduct == null)
             {
-                return await _warehouseRepository.AddProduct(product, quantity);
+                return Result.Failure<int>("The entered ID does not exist");
             }
 
             return await _warehouseRepository.ChangeQuantity(productId, quantity);
