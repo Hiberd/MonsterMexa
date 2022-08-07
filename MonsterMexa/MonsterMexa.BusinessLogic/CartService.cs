@@ -25,8 +25,11 @@ namespace MonsterMexa.BusinessLogic
                 return Result.Failure<int>("The entered ID does not exist");
             }
 
-            if ((productFromCart == null && productFromWarehouse.Quantity > 0) ||
-                 productFromWarehouse.Quantity > productFromCart?.Quantity)
+            if (productFromCart == null && productFromWarehouse.Quantity > 0)
+            {
+                await _cartRepository.AddProduct(productId, userId);
+            }
+            else if (productFromWarehouse.Quantity > productFromCart?.Quantity)
             {
                 await _cartRepository.AddProduct(productId, userId);
             }

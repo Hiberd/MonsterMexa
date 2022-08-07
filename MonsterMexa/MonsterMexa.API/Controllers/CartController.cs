@@ -16,7 +16,7 @@ namespace MonsterMexa.API.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
+        [HttpPost("{productId:int}")]
         public async Task<IActionResult> AddProductToCart(int productId)
         {
             string userId = GetUserId();

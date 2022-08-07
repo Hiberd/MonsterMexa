@@ -53,7 +53,6 @@ namespace MonsterMexa.DataAccess.Postgres
         public async Task<Product> GetById(int productId)
         {
             var product = await _dbContext.Products
-                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == productId);
 
             return _mapper.Map<Entities.Product, Domain.Product>(product);

@@ -77,10 +77,10 @@ namespace MonsterMexa.API.Controllers
             return Ok(productId);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{productId:int}")]
+        public async Task<IActionResult> Delete(int productId)
         {
-            var product = await _productService.Delete(id);
+            var product = await _productService.Delete(productId);
 
             return Ok(product);
         }

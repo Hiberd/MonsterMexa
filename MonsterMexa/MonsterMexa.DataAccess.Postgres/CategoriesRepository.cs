@@ -24,16 +24,15 @@ namespace MonsterMexa.DataAccess.Postgres
             return categoryEntity.Id;
         }
 
-        public async Task AddProduct(int productId, int categoryId)
+        public async Task<bool> AddProduct(int productId, int categoryId)
         {
             var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
             var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
-            if (product != null && category != null)
-            {
-                category.Products.Add(product);
-                await _dbContext.SaveChangesAsync();
-            }
+            category.Products.Add(product);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task Delete(int categoryId)

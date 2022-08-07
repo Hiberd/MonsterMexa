@@ -6,7 +6,7 @@ namespace MonsterMexa.Domain
     {
         public Task<int> AddCategory(Category category);
 
-        public Task AddProduct(int productId, int categoryId);
+        public Task<bool> AddProduct(int productId, int categoryId);
 
         public Task Delete(int categoryId);
 

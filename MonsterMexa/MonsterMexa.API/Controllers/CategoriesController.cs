@@ -43,12 +43,12 @@ namespace MonsterMexa.API.Controllers
             return Ok(categories);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{categoryId:int}")]
+        public async Task<IActionResult> Delete(int categoryId)
         {
-            await _categotiesService.Delete(id);
+            await _categotiesService.Delete(categoryId);
 
-            return Ok(id);
+            return Ok(categoryId);
         }
 
         [HttpPut]
@@ -66,12 +66,18 @@ namespace MonsterMexa.API.Controllers
             return Ok();
         }
 
-        [HttpPost("{categoryId:int}/products")]
+        [HttpPost("{categoryId:int}/{productId:int}")]
         public async Task<IActionResult> AddProduct(int productId, int categoryId)
         {
-            await _categotiesService.AddProduct(productId, categoryId);
+            var result = await _categotiesService.AddProduct(productId, categoryId);
 
-            return Ok();
+            if (result.IsFailure)
+            {
+                _logger.LogError(result.Error);
+                return BadRequest(result.Error);
+            }
+
+            return Ok(result.Value);
         }
     }
 }
