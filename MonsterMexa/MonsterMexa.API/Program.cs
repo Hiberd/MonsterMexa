@@ -6,8 +6,6 @@ using MonsterMexa.BusinessLogic;
 using MonsterMexa.DataAccess.Postgres;
 using MonsterMexa.Domain;
 
-//Environment.SetEnvironmentVariable("ConnectionStrings:MonsterMexaDb", "test");
-
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
