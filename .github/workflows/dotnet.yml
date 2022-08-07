@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: ["main"]
 
-env:
-  Connection_String: "User ID=postgres;Password=pwd;Host=localhost;Port=5433;Database=MonsterMexdb;"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -57,7 +54,7 @@ jobs:
         run: dotnet user-secrets init -p MonsterMexa/MonsterMexa.API/MonsterMexa.API.csproj
 
       - name: Set user secrets
-        run: dotnet user-secrets set "ConnectionStrings:MonsterMexaDb" "User ID=postgres;Password=pwd;Host=localhost;Port=5433;Database=MonsterMexdb;" -p MonsterMexa/MonsterMexa.API/MonsterMexa.API.csproj
+        run: dotnet user-secrets set "ConnectionStrings:MonsterMexaDb" "User ID=postgres;Password=pwd;Host=localhost;Port=5432;Database=MonsterMexdb;" -p MonsterMexa/MonsterMexa.API/MonsterMexa.API.csproj
 
       - name: Update database
         run: dotnet ef database update -p MonsterMexa/MonsterMexa.DataAccess.Postgres -s MonsterMexa/MonsterMexa.API
@@ -66,7 +63,7 @@ jobs:
         run: dotnet user-secrets init -p MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj
 
       - name: Set user secrets
-        run: dotnet user-secrets set "ConnectionStrings:MonsterMexaDb" "User ID=postgres;Password=pwd;Host=localhost;Port=5433;Database=MonsterMexdb;" -p MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj
+        run: dotnet user-secrets set "ConnectionStrings:MonsterMexaDb" "User ID=postgres;Password=pwd;Host=localhost;Port=5432;Database=MonsterMexdb;" -p MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj
 
       - name: Test
         run: dotnet test MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj --no-build --verbosity normal

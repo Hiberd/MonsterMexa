@@ -6,11 +6,15 @@ using MonsterMexa.BusinessLogic;
 using MonsterMexa.DataAccess.Postgres;
 using MonsterMexa.Domain;
 
+//Environment.SetEnvironmentVariable("ConnectionStrings:MonsterMexaDb", "test");
+
 var builder = WebApplication.CreateBuilder(args);
+
+var configuration = builder.Configuration;
 
 builder.Services.AddDbContext<MonsterMexaDbContext>(options =>
 {
-    options.UseNpgsql("Host=localhost;Port=5433;Database=MonsterMexdb;Username=postgres;Password=pwd;Integrated Security=True");
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MonsterMexaDb"));
 });
 
 builder.Services.AddAutoMapper(cfg =>
