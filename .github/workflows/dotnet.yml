@@ -22,5 +22,5 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore MonsterMexa/MonsterMexa.sln
     - name: Build 
-      run: dotnet build MonsterMexa.sln --no-restore
+      run: dotnet build MonsterMexa/MonsterMexa.sln --no-restore
    
