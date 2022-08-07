@@ -60,10 +60,10 @@ jobs:
         run: dotnet ef database update -p MonsterMexa/MonsterMexa.DataAccess.Postgres -s MonsterMexa/MonsterMexa.API
 
       - name: Init user secrets
-        run: dotnet user-secrets init -p MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj
+        run: dotnet user-secrets init -p MonsterMexa/MonsterMexa.IntegrationTests/MonsterMexa.IntegrationTests.csproj
 
       - name: Set user secrets
-        run: dotnet user-secrets set "ConnectionStrings:MonsterMexaDb" "User ID=postgres;Password=pwd;Host=localhost;Port=5432;Database=MonsterMexdb;" -p MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj
+        run: dotnet user-secrets set "ConnectionStrings:MonsterMexaDb" "User ID=postgres;Password=pwd;Host=localhost;Port=5432;Database=MonsterMexdb;" -p MonsterMexa/MonsterMexa.IntegrationTests/MonsterMexa.IntegrationTests.csproj
 
       - name: Test
-        run: dotnet test MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj --no-build --verbosity normal
+        run: dotnet test MonsterMexa/MonsterMexa.IntegrationTests/MonsterMexa.IntegrationTests.csproj --no-build --verbosity normal
