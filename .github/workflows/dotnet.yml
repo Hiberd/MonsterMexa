@@ -2,25 +2,71 @@ name: .NET
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+
+env:
+  Connection_String: "User ID=postgres;Password=pwd;Host=localhost;Port=5433;Database=MonsterMexdb;"
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
-    - name: Change directory
-      run: cd MonsterMexa
-    - name: Restore dependencies
-      run: dotnet restore MonsterMexa/MonsterMexa.sln
-    - name: Build 
-      run: dotnet build MonsterMexa/MonsterMexa.sln --no-restore
-   
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Change directory
+        run: cd MonsterMexa
+      - name: Restore dependencies
+        run: dotnet restore MonsterMexa/MonsterMexa.sln
+      - name: Build
+        run: dotnet build MonsterMexa/MonsterMexa.sln --no-restore
+
+  unit_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Test
+        run: dotnet test MonsterMexa/MonsterMexa.UnitTests/MonsterMexa.UnitTests.csproj --verbosity normal
+
+  integration_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup PostgreSQL
+
+        # You may pin to the exact commit or the version.
+        # uses: Harmon758/postgresql-action@0be19fa37850b22cb4c9bbf28a03abbf44abd863
+        uses: Harmon758/postgresql-action@v1.0.0
+        with:
+          postgresql db: MonsterMexdb
+          postgresql password: pwd
+          postgresql user: postgres
+
+      - name: Tool restore
+        run: dotnet tool restore
+
+      - name: Init user secrets
+        run: dotnet user-secrets init -p MonsterMexa/MonsterMexa.API/MonsterMexa.API.csproj
+
+      - name: Set user secrets
+        run: dotnet user-secrets set "ConnectionStrings:MonsterMexaDb" $Connection_String -p MonsterMexa/MonsterMexa.API/MonsterMexa.API.csproj
+
+      - name: Update database
+        run: dotnet ef database update -p MonsterMexa/MonsterMexa.DataAccess.Postgre -s MonsterMexa/MonsterMexa.API
+
+      - name: Init user secrets
+        run: dotnet user-secrets init -p MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj
+
+      - name: Set user secrets
+        run: dotnet user-secrets set "ConnectionStrings:MonsterMexaDb" $Connection_String -p MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj
+
+      - name: Test
+        run: dotnet test MonsterMexa/MonsterMexa.IntegrationalTests/MonsterMexa.IntegrationalTests.csproj --no-build --verbosity normal
