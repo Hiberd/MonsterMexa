@@ -20,7 +20,7 @@ jobs:
     - name: Change directory
       run: cd MonsterMexa
     - name: Restore dependencies
-      run: dotnet restore MonsterMexa.sln
+      run: dotnet restore MonsterMexa/MonsterMexa.sln
     - name: Build 
       run: dotnet build MonsterMexa.sln --no-restore
    
